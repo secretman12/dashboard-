@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  db:
+    image: "mysql:5.7"
+    container_name: 'mysql'
+    restart: always  
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+        - db_data:/var/lib/mysql
+        - ./init/init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
+    ports:
+      - "3307:3306"
+
+  dashboard:
+    build: 
+      context: ./plotly
+    ports:
+      - 5200:80
+    depends_on:
+      - db  
+  api:
+    build: 
+      context: ./api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+volumes:
+  db_data:
+
